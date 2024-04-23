@@ -2,7 +2,7 @@
 
 import numpy as np
 import pandas 
-
+import time 
 def knapsackFiller(filePath):
    
     file = open(filePath, 'r')
@@ -10,29 +10,44 @@ def knapsackFiller(filePath):
     print("The weight of the knapsack is: ", weight)
     numItems = file.readline().split()[1]
     print("The number of items in the file is: ", numItems)
-    knapsack = np.zeros((int(numItems), 2))
-    print(knapsack)
+    knapsack = np.zeros((int(numItems), 2), dtype = int)
+
+    
     #this is a test loop    
     for i in range(0,int( numItems)): 
         line = file.readline()
         knapsack[i][0] = int(line.split()[1])
         knapsack[i][1] = int(line.split()[3])
-    print(knapsack)
+
     return (int(weight), int(numItems), knapsack)
 
 def knapsackIE(weight, items, sack): 
     #Base Cases: Knapsack empty  
-    dpTable =np.zeros((weight+1,items+1))
-    for i in range(1, items): 
-        for j in range(1, weight):
-            if sack[i][0] > j:
-                dpTable[j][i] = dpTable[j][i-1]
+    dpTable = np.zeros((weight+1,items+1), dtype = int)
+    for j in range(0, items): 
+        for w in range(0, weight+1):
+            if sack[j][0] > w:
+                dpTable[w][j] = dpTable[w][j-1]
             else: 
-                sackValue = sack[i][0] 
-                print(sackValue)
-                dpTable[j][i] = max(dpTable[j][i-1], dpTable[j-sackValue][i-1]+sack[i][1])
-                 
-    print(dpTable)    
+                sackValue = sack[j][0]
+
+                dpTable[w][j] = max(dpTable[w][j-1], dpTable[(w-sackValue)][j-1]+sack[j][1])
+    return dpTable[weight][items-1]             
+
+def knapsackE(weight, items, sack): 
+    dpTable = np.zeros((weight+2, 2), dtype = int)
+    for j in range(0,items): 
+        for w in range(0,weight+1):
+            if sack[j][0] > w: 
+                dpTable[w][1] = dpTable[w][0]
+            else: 
+                sackValue = sack[j][0]
+                dpTable[w][1] = max(dpTable[w][0], dpTable[w-sackValue][0]+sack[j][1])
+        dpTable[:,0] = dpTable[:,1]
+
+        dpTable[:,1] = 0
+
+    return dpTable[weight][0]
 
 
 
@@ -43,7 +58,13 @@ def knapsackIE(weight, items, sack):
 
 
 def main():
+   start = time.time()
    (weight, items, knapsack)=  knapsackFiller('small.txt')
-   knapsackIE(weight, items, knapsack)
+   end = time.time()
+   print("Filling took :", end - start)
+   start2 = time.time()
+   print(knapsackE(weight, items, knapsack))
+   end2 = time.time()
+   print("Computing took: ", end2-start2)
 if __name__ == '__main__': 
     main()
