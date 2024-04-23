@@ -59,21 +59,24 @@ def knapsackBack(weight, items, sack):
             else:
                 sackValue = sack[j][0] 
                 dpTable[w][j] = max(dpTable[w][j-1], dpTable[(w-sackValue)][j-1]+sack[j][1])
-    print(dpTable)
-    #Backtracking 
+
+    #Backtracking
+    print("V ", dpTable[weight][items-1]) 
     itemsList = []
     weightLoc = weight
     for j in range(items-1, -1,-1):         
         if (j != 1): 
             if dpTable[weightLoc][j-1] != dpTable[weightLoc][j]: 
-                print(dpTable[weightLoc][j], dpTable[weightLoc][j-1], j)
                 itemsList.append(j+1)
                 weightLoc = weightLoc - sack[j][0]
         else:
             if dpTable[weightLoc][j] != 0:
                 itemsList.append(j)
                 break
-    return itemsList           
+    print("i ", len(itemsList))
+
+    for i in range(len(itemsList)-1, -1, -1): 
+        print(itemsList[i])           
 
 
 
@@ -83,11 +86,11 @@ def knapsackBack(weight, items, sack):
 
 def main():
    start = time.time()
-   (weight, items, knapsack)=  knapsackFiller('medium.txt')
+   (weight, items, knapsack)=  knapsackFiller('large.txt')
    end = time.time()
    print("Filling took :", end - start)
    start2 = time.time()
-   print(knapsackBack(weight, items, knapsack))
+   (knapsackBack(weight, items, knapsack))
    end2 = time.time()
    print("Computing took: ", end2-start2)
 if __name__ == '__main__': 
